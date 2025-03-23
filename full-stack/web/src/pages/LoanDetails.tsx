@@ -1,56 +1,86 @@
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Table, Badge, Container } from "react-bootstrap";
+import { Table, Badge, Container, Card, Alert } from "react-bootstrap";
+import { useQuery, gql } from "@apollo/client";
 import CustomButton from "../components/common/CustomButton";
+import Loader from "../components/common/Loader";
+import NotificationAlert from "../components/common/NotificationAlert";
 
-// Dummy data
-const loans = [
-  {
-    id: 1,
-    name: "Tom's Loan",
-    interest_rate: 5.0,
-    principal: 10000,
-    due_date: "2025-03-01",
-  },
-  {
-    id: 2,
-    name: "Chris Wailaka",
-    interest_rate: 3.5,
-    principal: 500000,
-    due_date: "2025-03-01",
-  },
-  {
-    id: 3,
-    name: "NP Mobile Money",
-    interest_rate: 4.5,
-    principal: 30000,
-    due_date: "2025-03-01",
-  },
-  {
-    id: 4,
-    name: "Esther's Autoparts",
-    interest_rate: 1.5,
-    principal: 40000,
-    due_date: "2025-03-01",
-  },
-];
+// Define the GraphQL query to fetch loan and payment details
+const GET_LOAN_DETAILS = gql`
+  query GetLoanDetails($loanId: Int!) {
+    loan(id: $loanId) {
+      id
+      name
+      interestRate
+      principal
+      dueDate
+      loanPayments {
+        id
+        paymentDate
+      }
+    }
+  }
+`;
 
-const loanPayments = [
-  { id: 1, loan_id: 1, payment_date: "2024-03-04" },
-  { id: 2, loan_id: 2, payment_date: "2024-03-15" },
-  { id: 3, loan_id: 3, payment_date: "2024-04-05" },
-];
+interface Loan {
+  id: number;
+  name: string;
+  interestRate: number;
+  principal: number;
+  dueDate: string;
+  loanPayments: {
+    id: number;
+    paymentDate: string;
+  }[];
+}
 
 const LoanDetails: React.FC = () => {
-  const { loanId } = useParams(); // Get the loan ID from the URL
+  const { loanId } = useParams<{ loanId: string }>(); // Get the loan ID from the URL
   const navigate = useNavigate(); // Hook for programmatic navigation
 
-  const loan = loans.find((loan) => loan.id === Number(loanId));
-  const payments = loanPayments.filter(
-    (payment) => payment.loan_id === Number(loanId)
-  );
+  console.log("loanId", loanId);
+
+  // Fetch loan details using GraphQL
+  const { loading, error, data, refetch } = useQuery(GET_LOAN_DETAILS, {
+    variables: { loanId: Number(loanId) },
+  });
+
+  // Initialize loan state with default values
+  const [loan, setLoan] = useState<Loan>({
+    id: 0,
+    name: "",
+    interestRate: 0,
+    principal: 0,
+    dueDate: "",
+    loanPayments: [],
+  });
+
+  // Update loan state when data is fetched
+  useEffect(() => {
+    if (data && data.loan) {
+      setLoan(data.loan);
+    }
+  }, [data]);
+
+    useEffect(() => {
+      refetch();
+    }, [refetch]);
+
+  console.log("data", data);
+
+  if (loading) return <Loader loading={true} />;
+  if (error) return <NotificationAlert message={error.message} type="danger" />;
+
+  // Check if loan data is available
+  if (!loan || !loan.id) {
+    return <div>Loan not found</div>;
+  }
+
+  const payments = loan.loanPayments || [];
 
   // Helper function to calculate payment status
-  const getPaymentStatus = (paymentDate, dueDate) => {
+  const getPaymentStatus = (paymentDate: string, dueDate: string) => {
     const payment = new Date(paymentDate);
     const due = new Date(dueDate);
     const diffTime = Math.abs(payment.getTime() - due.getTime());
@@ -63,29 +93,20 @@ const LoanDetails: React.FC = () => {
     return { status: "Unpaid", variant: "secondary" };
   };
 
-  if (!loan) {
-    return <div>Loan not found</div>;
-  }
-
   return (
     <Container className="mt-4">
       <h3>Loan Details</h3>
       <div className="loan-info mb-4">
         <h5>{loan.name}</h5>
         <p>
-          <strong>Interest Rate:</strong> {loan.interest_rate}%
+          <strong>Interest Rate:</strong> {loan.interestRate}%
         </p>
         <p>
           <strong>Principal:</strong> ${loan.principal}
         </p>
         <p>
-          <strong>Due Date:</strong> {loan.due_date}
+          <strong>Due Date:</strong> {loan.dueDate}
         </p>
-        <CustomButton
-          type="dark"
-          onClick={() => navigate(`/new-payment/${loanId}`)}
-          label="Add Payment"
-        />
       </div>
 
       <h2>Payment History</h2>
@@ -93,6 +114,7 @@ const LoanDetails: React.FC = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
+              <th>Load ID</th>
               <th>Payment Date</th>
               <th>Status</th>
             </tr>
@@ -100,12 +122,13 @@ const LoanDetails: React.FC = () => {
           <tbody>
             {payments.map((payment) => {
               const { status, variant } = getPaymentStatus(
-                payment.payment_date,
-                loan.due_date
+                payment.paymentDate,
+                loan.dueDate
               );
               return (
                 <tr key={payment.id}>
-                  <td>{payment.payment_date}</td>
+                  <td>{loan.id}</td>
+                  <td>{payment.paymentDate}</td>
                   <td>
                     <Badge bg={variant}>{status}</Badge>
                   </td>
@@ -115,8 +138,23 @@ const LoanDetails: React.FC = () => {
           </tbody>
         </Table>
       ) : (
-        <p>No payments recorded.</p>
+        // No Payments Placeholder
+        <Card className="text-center">
+          <Card.Body>
+            <Alert variant="info" className="mb-0">
+              <h4>No Payments Recorded</h4>
+              <p>There are no payment details to display for this loan.</p>
+            </Alert>
+          </Card.Body>
+        </Card>
       )}
+
+      {/* Add Payment Button Below the Table */}
+      <CustomButton
+        type="dark"
+        onClick={() => navigate(`/new-payment/${loanId}`)}
+        label="Add Payment"
+      />
     </Container>
   );
 };

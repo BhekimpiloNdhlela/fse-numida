@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import React, {  useState } from "react";
+import { Container, Form } from "react-bootstrap";
+import CustomButton from "../components/common/CustomButton";
+import NotificationAlert from "../components/common/NotificationAlert";
 
 interface LoanCalculatorProps {
   initialPrincipal?: number;
@@ -18,17 +20,6 @@ const LoanCalculator: React.FC<LoanCalculatorProps> = ({
   const [interest, setInterest] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
-  // Calculate interest whenever principal, rate, or months change
-  useEffect(() => {
-    if (principal <= 0 || rate <= 0 || months <= 0) {
-      setError("Please enter valid values for principal, rate, and months.");
-      setInterest(0);
-    } else {
-      setError(null);
-      setInterest((principal * rate * months) / 100);
-    }
-  }, [principal, rate, months]);
-
   const handlePrincipalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value);
     setPrincipal(isNaN(value) ? 0 : value);
@@ -44,6 +35,16 @@ const LoanCalculator: React.FC<LoanCalculatorProps> = ({
     setMonths(isNaN(value) ? 0 : value);
   };
 
+  const handleCalculateInterest = () => {
+    if (principal <= 0 || rate <= 0 || months <= 0) {
+      setError("Please enter valid values for principal, rate, and months.");
+      setInterest(0);
+    } else {
+      setError("");
+      setInterest((principal * rate * months) / 100);
+    }
+  };
+
   return (
     <Container className="mt-4">
       <h3>Loan Interest Calculator</h3>
@@ -51,11 +52,9 @@ const LoanCalculator: React.FC<LoanCalculatorProps> = ({
         <Form.Group className="mb-3" controlId="principal">
           <Form.Label>Principal Amount ($)</Form.Label>
           <Form.Control
-            // type="number"
             placeholder="Enter principal amount"
             value={principal}
             onChange={handlePrincipalChange}
-            // min="0"
           />
         </Form.Group>
 
@@ -82,9 +81,10 @@ const LoanCalculator: React.FC<LoanCalculatorProps> = ({
         </Form.Group>
       </Form>
 
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      <h4>Calculated Interest: ${interest.toFixed(2)}</h4>
+      {error && <NotificationAlert type="danger" message={error} />}
+      
+      <h5>Calculated Interest: ${interest.toFixed(2)}</h5>
+      <CustomButton label="Calculate Interest" type="dark" onClick={() => handleCalculateInterest()} />
     </Container>
   );
 };

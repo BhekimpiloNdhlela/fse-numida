@@ -1,53 +1,63 @@
-import React from "react";
-
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Table, Container } from "react-bootstrap";
+import { Table, Badge, Container } from "react-bootstrap";
+import { useQuery, gql } from "@apollo/client";
 
-// Dummy data
-const loans: Loan[] = [
-  {
-    id: 1,
-    name: "Tom's Loan",
-    interest_rate: 5.0,
-    principal: 10000,
-    due_date: "2025-03-01",
-  },
-  {
-    id: 2,
-    name: "Chris Wailaka",
-    interest_rate: 3.5,
-    principal: 500000,
-    due_date: "2025-03-01",
-  },
-  {
-    id: 3,
-    name: "NP Mobile Money",
-    interest_rate: 4.5,
-    principal: 30000,
-    due_date: "2025-03-01",
-  },
-  {
-    id: 4,
-    name: "Esther's Autoparts",
-    interest_rate: 1.5,
-    principal: 40000,
-    due_date: "2025-03-01",
-  },
-];
+import Loader from "../components/common/Loader";
+import NotificationAlert from "../components/common/NotificationAlert";
 
-const loanPayments: LoanPayment[] = [
-  { id: 1, loan_id: 1, payment_date: "2024-03-04" },
-  { id: 2, loan_id: 2, payment_date: "2024-03-15" },
-  { id: 3, loan_id: 3, payment_date: "2024-04-05" },
-];
+const GET_LOANS = gql`
+  query GetLoans {
+    loans {
+      id
+      name
+      interestRate
+      principal
+      dueDate
+      loanPayments {
+        id
+        paymentDate
+      }
+    }
+  }
+`;
+
+interface Loan {
+  id: number;
+  name: string;
+  interestRate: number;
+  principal: number;
+  dueDate: string;
+  loanPayments: { id: number; paymentDate: string }[];
+}
 
 const LoanList: React.FC = () => {
   const navigate = useNavigate();
 
-  // Helper function to get payments for a specific loan
-  const getPaymentsForLoan = (loanId: number) => {
-    return loanPayments.filter((payment) => payment.loan_id === loanId);
-  };
+  // Fetch data using GraphQL with "network-only" fetch policy
+  const { loading, error, data, refetch } = useQuery(GET_LOANS, {
+    fetchPolicy: "network-only", // Always fetch fresh data
+  });
+
+  // Initialize state for loans
+  const [loans, setLoans] = useState<Loan[]>([]);
+
+  console.log("loans data", data);
+
+  // Update loans state when data is fetched
+  useEffect(() => {
+    if (data && data.loans) {
+      setLoans(data.loans);
+    }
+  }, [data]);
+
+  // Refetch data when the component mounts
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  if (loading) return <Loader loading={true} />;
+  if (error) return <NotificationAlert message={error.message} type="danger" />;
 
   // Handle row click
   const handleRowClick = (loanId: number) => {
@@ -73,16 +83,23 @@ const LoanList: React.FC = () => {
             <tr
               key={loan.id}
               onClick={() => handleRowClick(loan.id)}
-              style={{ cursor: "pointer" }} // Change cursor to pointer
+              style={{ cursor: "pointer" }}
             >
               <td>{loan.id}</td>
               <td>{loan.name}</td>
-              <td>{loan.interest_rate}</td>
-              <td>{loan.principal}</td>
-              <td>{loan.due_date}</td>
+              <td>{loan.interestRate}</td>
+              <td>${loan.principal}</td>
+              <td>{loan.dueDate}</td>
               <td>
-                {getPaymentsForLoan(loan.id).map(
-                  (payment) => payment.payment_date
+                {loan.loanPayments && loan.loanPayments.length > 0 ? (
+                  <Badge bg="dark" className="me-1">
+                    {
+                      loan.loanPayments[loan.loanPayments.length - 1]
+                        .paymentDate
+                    }
+                  </Badge>
+                ) : (
+                  <Badge bg="secondary">No Payments</Badge>
                 )}
               </td>
             </tr>
