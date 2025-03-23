@@ -1,58 +1,53 @@
-import './App.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import LoanList from "./pages/LoanList";
+import LoanDetails from "./pages/LoanDetails";
+import AddNewPayment from "./pages/AddNewPayment";
+import LoanCalculator from "./pages/LoanCalculator";
+import AddNewLoan from "./pages/AddNewLoan";
+import PageNotFound from "./pages/PageNotFound"; // Import the new component
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoanList from './components/UserLoanList';
-import LoanDetails from './components/LoanDetails';
+const App = () => {
+  return (
+    <Router>
+      {/* Bootstrap Navbar */}
+      <Navbar bg="dark" variant="dark" fixed="top">
+        <Container>
+          <Navbar.Brand as={Link} to="/">
+            Loan Management System
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse className="justify-content-end">
+            {/* Nav links aligned to the left */}
+            <Nav>
+              <Nav.Link as={Link} to="/">
+                Loan List
+              </Nav.Link>
+              <Nav.Link as={Link} to="/new-loan">
+                New Loan
+              </Nav.Link>
+              <Nav.Link as={Link} to="/loan-calculator">
+                Loan Calculator
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
 
+      {/* Main Content */}
+      <Container className="mt-5 pt-4">
+        <Routes>
+          <Route path="/" element={<LoanList />} />
+          <Route path="/loan/:loanId" element={<LoanDetails />} />
+          <Route path="/new-payment/:loanId" element={<AddNewPayment />} />
+          <Route path="/loan-calculator" element={<LoanCalculator />} />
+          <Route path="/new-loan" element={<AddNewLoan />} />
+          {/* Catch-all route for 404 Page */}
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </Container>
+    </Router>
+  );
+};
 
-
-import AddNewPayment from './components/AddNewPayment'
-import NotificationAlert from './components/common/NotificationAlert';
-import Loader from './components/common/Loader';
-// import UserLoanList from './components/UserLoanList';
-import LoanCalculator from './components/LoanCalculator';
-
-function App() {
-    return (
-        <>
-   
-
-        <Router>
-
-            <div className="container mt-5">
-                <h1>Loan Management System</h1>
-                <Routes>
-                    <Route path="/" element={<LoanList />} />
-                    <Route path="/loan/:loanId" element={<LoanDetails />} />
-                </Routes>
-            </div>
-        </Router>
-
-
-        </>
-    )
-}
-
-export default App
-
-
-
-
-// https://www.davidhu.io/react-spinners/storybook/?path=/docs/clockloader--docs
-
-
-
-
-{/* <NotificationAlert type='primary' message="Hello My name is bhekimpilo ndhlela and I am a cloud engineer"/>
-<NotificationAlert type='secondary' message="Hello My name is bhekimpilo ndhlela and I am a cloud engineer"/>
-<NotificationAlert type='success' message="Hello My name is bhekimpilo ndhlela and I am a cloud engineer"/>
-<NotificationAlert type='danger' message="Hello My name is bhekimpilo ndhlela and I am a cloud engineer"/>
-<NotificationAlert type='warning' message="Hello My name is bhekimpilo ndhlela and I am a cloud engineer"/>
-<NotificationAlert type='info' message="Hello My name is bhekimpilo ndhlela and I am a cloud engineer"/>
-// <Loader loading={false}/>
-<AddNewPayment />
-<LoanCalculator/>
-
-
-<LoanList/> */}
+export default App;
