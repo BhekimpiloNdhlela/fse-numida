@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Alert, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import CustomButton from "../components/common/CustomButton";
 
 const AddNewLoan = () => {
   const [name, setName] = useState<string>("");
@@ -44,8 +45,8 @@ const AddNewLoan = () => {
   };
 
   return (
-    <Container className="mt-5">
-      <h2>Create New Loan</h2>
+    <Container className="mt-4">
+      <h3>Create New Loan</h3>
       <Form onSubmit={handleSubmit}>
         {/* Loan Name */}
         <Form.Group className="mb-3" controlId="name">
@@ -98,10 +99,7 @@ const AddNewLoan = () => {
           />
         </Form.Group>
 
-        {/* Submit Button */}
-        <Button variant="primary" type="submit">
-          Create Loan
-        </Button>
+        <CustomButton label="Add loan" type="dark" onClick={() => {}} />
 
         {/* Error Message */}
         {error && (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert } from "react-bootstrap";
 
 interface LoanCalculatorProps {
   initialPrincipal?: number;
@@ -45,7 +45,7 @@ const LoanCalculator: React.FC<LoanCalculatorProps> = ({
   };
 
   return (
-    <div>
+    <Container className="mt-4">
       <h3>Loan Interest Calculator</h3>
       <Form>
         <Form.Group className="mb-3" controlId="principal">
@@ -85,7 +85,7 @@ const LoanCalculator: React.FC<LoanCalculatorProps> = ({
       {error && <Alert variant="danger">{error}</Alert>}
 
       <h4>Calculated Interest: ${interest.toFixed(2)}</h4>
-    </div>
+    </Container>
   );
 };
 

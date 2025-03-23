@@ -24,7 +24,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 }) => {
   return (
     <div className="d-grid gap-2">
-      <Button variant={type} onClick={onClick}>
+      <Button variant={type || "dark"} onClick={onClick}>
         {label}
       </Button>
     </div>

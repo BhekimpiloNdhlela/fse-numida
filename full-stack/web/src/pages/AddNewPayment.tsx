@@ -1,12 +1,13 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import {Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
+import CustomButton from "../components/common/CustomButton";
 
 const AddNewPayment = () => {
   return (
     <Container className="mt-4">
+      <h3>New Payment</h3>
       <Form>
-        <h1>New Payment</h1>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Payment Loan Id:</Form.Label>
           <Form.Control type="text" placeholder="XXXX-XXXX-XXXX-XXXX" />
@@ -19,11 +20,8 @@ const AddNewPayment = () => {
             Provide a valid loan payment ammount.
           </Form.Text>
         </Form.Group>
-        <div className="d-grid gap-2">
-          <Button variant="primary" type="submit">
-            Submit
-          </Button>
-        </div>
+
+        <CustomButton type="dark" onClick={() => {}} label="Make Payment" />
       </Form>
     </Container>
   );

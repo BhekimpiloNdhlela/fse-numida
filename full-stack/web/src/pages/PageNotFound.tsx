@@ -2,13 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Container } from "react-bootstrap";
 
-const PageNotFound = () => {
+const PageNotFound: React.FC = () => {
   return (
     <Container
       className="d-flex flex-column justify-content-center align-items-center"
-      style={{ 
+      style={{
         minHeight: "80vh",
-        marginTop: "0"
+        marginTop: "0",
       }}
     >
       <h1>404 - Page Not Found</h1>

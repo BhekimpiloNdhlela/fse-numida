@@ -1,6 +1,7 @@
 import React from "react";
-import { Table, Card } from "react-bootstrap";
+
 import { useNavigate } from "react-router-dom";
+import { Table, Container } from "react-bootstrap";
 
 // Dummy data
 const loans: Loan[] = [
@@ -54,40 +55,41 @@ const LoanList: React.FC = () => {
   };
 
   return (
-    <Table striped bordered hover>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Interest Rate (%)</th>
-          <th>Principal ($)</th>
-          <th>Due Date</th>
-          <th>Payments</th>
-        </tr>
-      </thead>
-      <tbody>
-        {loans.map((loan) => (
-          <tr
-            key={loan.id}
-            onClick={() => handleRowClick(loan.id)}
-            style={{ cursor: "pointer" }} // Change cursor to pointer
-          >
-            <td>{loan.id}</td>
-            <td>{loan.name}</td>
-            <td>{loan.interest_rate}</td>
-            <td>{loan.principal}</td>
-            <td>{loan.due_date}</td>
-            <td>
-              <ul>
-                {getPaymentsForLoan(loan.id).map((payment) => (
-                  <li key={payment.id}>Payment Date: {payment.payment_date}</li>
-                ))}
-              </ul>
-            </td>
+    <Container className="mt-4">
+      <h3>List of Active Loans</h3>
+      <Table striped bordered hover>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Interest Rate (%)</th>
+            <th>Principal ($)</th>
+            <th>Due Date</th>
+            <th>Last Payment Date</th>
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {loans.map((loan) => (
+            <tr
+              key={loan.id}
+              onClick={() => handleRowClick(loan.id)}
+              style={{ cursor: "pointer" }} // Change cursor to pointer
+            >
+              <td>{loan.id}</td>
+              <td>{loan.name}</td>
+              <td>{loan.interest_rate}</td>
+              <td>{loan.principal}</td>
+              <td>{loan.due_date}</td>
+              <td>
+                {getPaymentsForLoan(loan.id).map(
+                  (payment) => payment.payment_date
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </Container>
   );
 };
 

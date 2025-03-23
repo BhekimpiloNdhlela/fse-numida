@@ -1,6 +1,6 @@
-import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Table, Badge, Container, Button } from "react-bootstrap";
+import { Table, Badge, Container } from "react-bootstrap";
+import CustomButton from "../components/common/CustomButton";
 
 // Dummy data
 const loans = [
@@ -40,7 +40,7 @@ const loanPayments = [
   { id: 3, loan_id: 3, payment_date: "2024-04-05" },
 ];
 
-const LoanDetails = () => {
+const LoanDetails: React.FC = () => {
   const { loanId } = useParams(); // Get the loan ID from the URL
   const navigate = useNavigate(); // Hook for programmatic navigation
 
@@ -68,10 +68,10 @@ const LoanDetails = () => {
   }
 
   return (
-    <Container className="mt-1">
-      <h1>Loan Details</h1>
+    <Container className="mt-4">
+      <h3>Loan Details</h3>
       <div className="loan-info mb-4">
-        <h2>{loan.name}</h2>
+        <h5>{loan.name}</h5>
         <p>
           <strong>Interest Rate:</strong> {loan.interest_rate}%
         </p>
@@ -81,14 +81,11 @@ const LoanDetails = () => {
         <p>
           <strong>Due Date:</strong> {loan.due_date}
         </p>
-        <div className="d-grid gap-2">
-          <Button
-            variant="primary"
-            onClick={() => navigate(`/new-payment/${loanId}`)}
-          >
-            Make Payment
-          </Button>
-        </div>
+        <CustomButton
+          type="dark"
+          onClick={() => navigate(`/new-payment/${loanId}`)}
+          label="Add Payment"
+        />
       </div>
 
       <h2>Payment History</h2>
