@@ -1,31 +1,7 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 
-/**
- * Defines the available button types.
- */
-type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "success"
-  | "danger"
-  | "warning"
-  | "info"
-  | "light"
-  | "dark"
-  | "link";
-
-/**
- * Props for the CustomButton component.
- */
-interface CustomButtonProps {
-  /** The type of button variant to use. */
-  type: ButtonVariant;
-  /** Function to handle button clicks. */
-  onClick: () => void;
-  /** The label text displayed on the button. */
-  label: string;
-}
+import { CustomButtonProps } from "../../utuils/interfaces";
 
 /**
  * A customizable button component using React-Bootstrap.

@@ -1,13 +1,7 @@
 import React from "react";
 import { ClockLoader } from "react-spinners";
 
-/**
- * Props for the Loader component.
- */
-interface LoaderProps {
-  /** Determines whether the loader is visible. */
-  loading: boolean;
-}
+import { LoaderProps } from "../../utuils/interfaces";
 
 /**
  * A full-screen loading spinner component using react-spinners.

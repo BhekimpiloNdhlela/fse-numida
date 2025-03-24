@@ -18,7 +18,9 @@ const NewPayment: React.FC<NewPaymentProps> = ({
   onPaymentSubmit,
 }: NewPaymentProps): JSX.Element => {
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
-  const [paymentDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [paymentDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   /**
@@ -27,7 +29,9 @@ const NewPayment: React.FC<NewPaymentProps> = ({
    *
    * @param {React.ChangeEvent<HTMLInputElement>} e - The change event triggered by the input.
    */
-  const handlePaymentAmountChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handlePaymentAmountChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     const value = parseFloat(e.target.value);
     setPaymentAmount(isNaN(value) ? 0 : value);
 
