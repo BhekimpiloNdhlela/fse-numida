@@ -15,7 +15,7 @@ interface LoaderProps {
  * @param {LoaderProps} props - Component properties.
  * @returns {JSX.Element} The rendered loader component.
  */
-const Loader: React.FC<LoaderProps> = ({ loading }) => {
+const Loader: React.FC<LoaderProps> = ({ loading }): JSX.Element => {
   return (
     <div
       style={{
@@ -31,7 +31,12 @@ const Loader: React.FC<LoaderProps> = ({ loading }) => {
         backgroundColor: "rgba(255, 255, 255, 0.8)",
       }}
     >
-      <ClockLoader size={200} color="gray" loading={loading} speedMultiplier={1} />
+      <ClockLoader
+        size={200}
+        color="gray"
+        loading={loading}
+        speedMultiplier={1}
+      />
     </div>
   );
 };

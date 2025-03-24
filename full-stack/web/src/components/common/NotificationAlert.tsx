@@ -32,7 +32,7 @@ interface NotificationAlertProps {
 const NotificationAlert: React.FC<NotificationAlertProps> = ({
   type,
   message,
-}) => {
+}): JSX.Element => {
   return <Alert variant={type}>{message}</Alert>;
 };
 

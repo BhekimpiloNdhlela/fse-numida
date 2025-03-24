@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Table, Badge, Container, Card, Alert } from "react-bootstrap";
+import { Table, Badge, Container, Alert } from "react-bootstrap";
 import { useQuery, gql } from "@apollo/client";
 import CustomButton from "../components/common/CustomButton";
 import Loader from "../components/common/Loader";
 import NotificationAlert from "../components/common/NotificationAlert";
 
-// Define the GraphQL query to fetch loan and payment details
+/**
+ * GraphQL query to fetch loan and payment details
+ */
 const GET_LOAN_DETAILS = gql`
   query GetLoanDetails($loanId: Int!) {
     loan(id: $loanId) {
@@ -23,28 +25,50 @@ const GET_LOAN_DETAILS = gql`
   }
 `;
 
+/**
+ * Interface for Payment data
+ */
+interface Payment {
+  id: number;
+  paymentDate: string;
+}
+
+/**
+ * Interface for Loan data
+ */
 interface Loan {
   id: number;
   name: string;
   interestRate: number;
   principal: number;
   dueDate: string;
-  loanPayments: {
-    id: number;
-    paymentDate: string;
-  }[];
+  loanPayments: Payment[];
 }
 
-const LoanDetails: React.FC = () => {
-  const { loanId } = useParams<{ loanId: string }>(); // Get the loan ID from the URL
-  const navigate = useNavigate(); // Hook for programmatic navigation
+/**
+ * Interface for Payment Status
+ */
+interface PaymentStatus {
+  status: string;
+  variant: string;
+}
 
-  console.log("loanId", loanId);
+/**
+ * Component for displaying loan details and payment history
+ *
+ * @returns {JSX.Element} The LoanDetails component
+ */
+const LoanDetails: React.FC = (): JSX.Element => {
+  const { loanId } = useParams<{ loanId: string }>();
+  const navigate = useNavigate();
 
   // Fetch loan details using GraphQL
-  const { loading, error, data, refetch } = useQuery(GET_LOAN_DETAILS, {
-    variables: { loanId: Number(loanId) },
-  });
+  const { loading, error, data, refetch } = useQuery<{ loan: Loan }>(
+    GET_LOAN_DETAILS,
+    {
+      variables: { loanId: Number(loanId) },
+    }
+  );
 
   // Initialize loan state with default values
   const [loan, setLoan] = useState<Loan>({
@@ -58,29 +82,26 @@ const LoanDetails: React.FC = () => {
 
   // Update loan state when data is fetched
   useEffect(() => {
-    if (data && data.loan) {
+    if (data?.loan) {
       setLoan(data.loan);
     }
   }, [data]);
 
-    useEffect(() => {
-      refetch();
-    }, [refetch]);
+  // Refetch data when component mounts
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
-  console.log("data", data);
-
-  if (loading) return <Loader loading={true} />;
-  if (error) return <NotificationAlert message={error.message} type="danger" />;
-
-  // Check if loan data is available
-  if (!loan || !loan.id) {
-    return <div>Loan not found</div>;
-  }
-
-  const payments = loan.loanPayments || [];
-
-  // Helper function to calculate payment status
-  const getPaymentStatus = (paymentDate: string, dueDate: string) => {
+  /**
+   * Calculates payment status based on payment date and due date
+   * @param {string} paymentDate - The payment date
+   * @param {string} dueDate - The loan due date
+   * @returns {PaymentStatus} The payment status and badge variant
+   */
+  const getPaymentStatus = (
+    paymentDate: string,
+    dueDate: string
+  ): PaymentStatus => {
     const payment = new Date(paymentDate);
     const due = new Date(dueDate);
     const diffTime = Math.abs(payment.getTime() - due.getTime());
@@ -93,28 +114,37 @@ const LoanDetails: React.FC = () => {
     return { status: "Unpaid", variant: "secondary" };
   };
 
+  if (loading) return <Loader loading={true} />;
+  if (error) return <NotificationAlert message={error.message} type="danger" />;
+  if (!loan?.id) return <div>Loan not found</div>;
+
+  const payments = loan.loanPayments || [];
+
   return (
     <Container className="mt-4">
       <h3>Loan Details</h3>
       <div className="loan-info mb-4">
-        <h5>{loan.name}</h5>
+        <p>
+          <strong>Loan Name:</strong> {loan.name}
+        </p>
         <p>
           <strong>Interest Rate:</strong> {loan.interestRate}%
         </p>
         <p>
-          <strong>Principal:</strong> ${loan.principal}
+          <strong>Principal:</strong> ${loan.principal.toLocaleString()}
         </p>
         <p>
-          <strong>Due Date:</strong> {loan.dueDate}
+          <strong>Due Date:</strong>{" "}
+          {new Date(loan.dueDate).toLocaleDateString()}
         </p>
       </div>
 
-      <h2>Payment History</h2>
+      <h4>Payment History</h4>
       {payments.length > 0 ? (
-        <Table striped bordered hover>
+        <Table striped bordered hover responsive>
           <thead>
             <tr>
-              <th>Load ID</th>
+              <th>Loan ID</th>
               <th>Payment Date</th>
               <th>Status</th>
             </tr>
@@ -128,7 +158,7 @@ const LoanDetails: React.FC = () => {
               return (
                 <tr key={payment.id}>
                   <td>{loan.id}</td>
-                  <td>{payment.paymentDate}</td>
+                  <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
                   <td>
                     <Badge bg={variant}>{status}</Badge>
                   </td>
@@ -138,18 +168,12 @@ const LoanDetails: React.FC = () => {
           </tbody>
         </Table>
       ) : (
-        // No Payments Placeholder
-        <Card className="text-center">
-          <Card.Body>
-            <Alert variant="info" className="mb-0">
-              <h4>No Payments Recorded</h4>
-              <p>There are no payment details to display for this loan.</p>
-            </Alert>
-          </Card.Body>
-        </Card>
+        <Alert variant="info" className="mb-3 text-center">
+          <h4>No Payments Recorded</h4>
+          <p>There are no payment details to display for this loan.</p>
+        </Alert>
       )}
 
-      {/* Add Payment Button Below the Table */}
       <CustomButton
         type="dark"
         onClick={() => navigate(`/new-payment/${loanId}`)}
