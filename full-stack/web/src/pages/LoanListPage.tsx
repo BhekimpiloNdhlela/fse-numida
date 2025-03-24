@@ -52,12 +52,7 @@ const LoanListPage: React.FC = (): JSX.Element => {
     navigate(`/loan/${loanId}`);
   };
 
-  return (
-    <LoanList
-      loans={data?.loans || []}
-      onRowClick={handleRowClick}
-    />
-  );
+  return <LoanList loans={data?.loans || []} onRowClick={handleRowClick} />;
 };
 
 export default LoanListPage;
