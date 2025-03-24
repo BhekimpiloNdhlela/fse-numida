@@ -2,12 +2,12 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 // Import page components
-import LoanList from "../pages/LoanList";
-import LoanDetails from "../pages/LoanDetails";
-import AddNewPayment from "../pages/AddNewPayment";
-import LoanCalculator from "../pages/LoanCalculator";
-import AddNewLoan from "../pages/AddNewLoan";
-import PageNotFound from "../pages/PageNotFound";
+import LoanListPage from "../pages/LoanListPage";
+import LoanDetailsPage from "../pages/LoanDetailsPage";
+import LoanCalculatorPage from "../pages/LoanCalculatorPage";
+import NewPaymentPage from "../pages/NewPaymentPage";
+import PageNotFoundPage from "../pages/PageNotFoundPage";
+import NewLoanPage from "../pages/NewLoanPage";
 
 /**
  * AppRoutes Component
@@ -20,13 +20,13 @@ import PageNotFound from "../pages/PageNotFound";
 const AppRoutes: React.FC = (): JSX.Element => {
   return (
     <Routes>
-      <Route path="/" element={<LoanList />} />
-      <Route path="/loan/:loanId" element={<LoanDetails />} />
-      <Route path="/new-payment/:loanId" element={<AddNewPayment />} />
-      <Route path="/loan-calculator" element={<LoanCalculator />} />
-      <Route path="/new-loan" element={<AddNewLoan />} />
+      <Route path="/" element={<LoanListPage />} />
+      <Route path="/loan/:loanId" element={<LoanDetailsPage />} />
+      <Route path="/new-payment/:loanId" element={<NewPaymentPage />} />
+      <Route path="/loan-calculator" element={<LoanCalculatorPage />} />
+      <Route path="/new-loan" element={<NewLoanPage />} />
       {/* Catch-all route for 404 errors. This will be displayed when no other routes match */}
-      <Route path="*" element={<PageNotFound />} />
+      <Route path="*" element={<PageNotFoundPage />} />
     </Routes>
   );
 };
