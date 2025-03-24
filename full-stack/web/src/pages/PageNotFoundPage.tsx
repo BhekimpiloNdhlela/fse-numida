@@ -11,7 +11,7 @@ import { Button, Container } from "react-bootstrap";
  
  * @returns {JSX.Element} The rendered 404 page component
  */
-const PageNotFound: React.FC = (): JSX.Element => {
+const PageNotFoundPage: React.FC = (): JSX.Element => {
   return (
     <Container
       className="d-flex flex-column justify-content-center align-items-center"
@@ -29,4 +29,4 @@ const PageNotFound: React.FC = (): JSX.Element => {
   );
 };
 
-export default PageNotFound;
+export default PageNotFoundPage;
