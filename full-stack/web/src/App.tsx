@@ -1,46 +1,53 @@
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import LoanList from "./pages/LoanList";
+import LoanDetails from "./pages/LoanDetails";
+import AddNewPayment from "./pages/AddNewPayment";
+import LoanCalculator from "./pages/LoanCalculator";
+import AddNewLoan from "./pages/AddNewLoan";
+import PageNotFound from "./pages/PageNotFound"; // Import the new component
 
-const AddNewPayment = () => {
-    return (
-        <div>
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault()
-                }}
-            >
-                <p>
-                    <label>Payment Loan Id</label>
-                    <input name="loan-id" onChange={() => {}} />
-                </p>
+const App = () => {
+  return (
+    <Router>
+      {/* Bootstrap Navbar */}
+      <Navbar bg="dark" variant="dark" fixed="top">
+        <Container>
+          <Navbar.Brand as={Link} to="/">
+            Loan Management System
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse className="justify-content-end">
+            {/* Nav links aligned to the left */}
+            <Nav>
+              <Nav.Link as={Link} to="/">
+                Loan List
+              </Nav.Link>
+              <Nav.Link as={Link} to="/new-loan">
+                New Loan
+              </Nav.Link>
+              <Nav.Link as={Link} to="/loan-calculator">
+                Loan Calculator
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
 
-                <p>
-                    <label>Payment Amount</label>
-                    <input
-                        name="payment-amount"
-                        type="number"
-                        onChange={() => {}}
-                    />
-                </p>
-                <p>
-                    <button type="submit">Add Payment</button>
-                </p>
-            </form>
-        </div>
-    )
-}
+      {/* Main Content */}
+      <Container className="mt-5 pt-4">
+        <Routes>
+          <Route path="/" element={<LoanList />} />
+          <Route path="/loan/:loanId" element={<LoanDetails />} />
+          <Route path="/new-payment/:loanId" element={<AddNewPayment />} />
+          <Route path="/loan-calculator" element={<LoanCalculator />} />
+          <Route path="/new-loan" element={<AddNewLoan />} />
+          {/* Catch-all route for 404 Page */}
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </Container>
+    </Router>
+  );
+};
 
-function App() {
-    return (
-        <>
-            <div>
-                <h1>Existing Loans & Payments</h1>
-                <ul></ul>
-
-                <h1>Add New Payment</h1>
-                <AddNewPayment />
-            </div>
-        </>
-    )
-}
-
-export default App
+export default App;
