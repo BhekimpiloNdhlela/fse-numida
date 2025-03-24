@@ -33,7 +33,11 @@ interface CustomButtonProps {
  * @param {CustomButtonProps} props - Component properties.
  * @returns {JSX.Element} The rendered button component.
  */
-const CustomButton: React.FC<CustomButtonProps> = ({ type, onClick, label }): JSX.Element => {
+const CustomButton: React.FC<CustomButtonProps> = ({
+  type,
+  onClick,
+  label,
+}): JSX.Element => {
   return (
     <div className="d-grid gap-2">
       <Button variant={type || "dark"} onClick={onClick}>
