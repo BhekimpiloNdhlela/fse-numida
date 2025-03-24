@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 
-# Import the REST and the GraphQL Blueprint
+# import the REST and the GraphQL Blueprint
 from .routes import graphql_bp, rest_bp  
 
 def create_app():
@@ -17,10 +17,10 @@ def create_app():
     app = Flask(__name__)
     CORS(app)
 
-    # Register the GraphQL Blueprint
+    # register the GraphQL Blueprint
     app.register_blueprint(graphql_bp)
 
-    # Register the REST Blueprint
+    # register the REST Blueprint
     app.register_blueprint(rest_bp)
 
     return app

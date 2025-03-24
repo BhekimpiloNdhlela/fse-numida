@@ -39,18 +39,18 @@ def add_loan():
         - 400 Bad Request: If the input data is invalid.
     """
     data = request.get_json()
-    logging.info("Received loan creation request: %s", data)
+    logging.info("[INFO]: received loan creation request: %s", data)
 
     # validate the input data
     if not data or "name" not in data or "principal" not in data or "interest_rate" not in data or "due_date" not in data:
-        logging.warning("Invalid input data for loan creation: %s", data)
+        logging.warning("[WARNING]: invalid input data for loan creation: %s", data)
         return jsonify({"error": "Invalid input data"}), 400
 
     try:
         # convert the due_date string to a datetime.date object
         due_date = datetime.strptime(data["due_date"], "%Y-%m-%d").date()
     except ValueError:
-        logging.error("Invalid date format: %s", data["due_date"])
+        logging.error("[ERROR]: invalid date format: %s", data["due_date"])
         return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
 
     # generate a new loan ID
@@ -67,7 +67,7 @@ def add_loan():
     }
     loans.append(new_loan)
 
-    logging.info("Loan created successfully: %s", new_loan)
+    logging.info("[INFO]: loan created successfully: %s", new_loan)
     return jsonify(new_loan), 201
 
 
@@ -89,24 +89,24 @@ def add_payment_to_loan(loan_id):
         - 404 Not Found: If the specified loan is not found.
     """
     data = request.get_json()
-    logging.info("Received payment request for loan %d: %s", loan_id, data)
+    logging.info("[INFO]: received payment request for loan %d: %s", loan_id, data)
 
     # validate the input data
     if not data or "payment_date" not in data or "amount" not in data:
-        logging.warning("Invalid input data for payment: %s", data)
+        logging.warning("[WARNING]: invalid input data for payment: %s", data)
         return jsonify({"error": "Invalid input data. 'payment_date' and 'amount' are required."}), 400
 
     try:
         # convert the payment_date string to a datetime.date object
         payment_date = datetime.strptime(data["payment_date"], "%Y-%m-%d").date()
     except ValueError:
-        logging.error("Invalid date format for payment: %s", data["payment_date"])
+        logging.error("[ERROR]: invalid date format for payment: %s", data["payment_date"])
         return jsonify({"error": "Invalid date format. Use YYYY-MM-DD."}), 400
 
     # find the loan by loan_id
     loan = next((loan for loan in loans if loan["id"] == loan_id), None)
     if not loan:
-        logging.error("Loan with ID %d not found", loan_id)
+        logging.error("[ERROR]: loan with ID %d not found", loan_id)
         return jsonify({"error": "Loan not found"}), 404
 
     # ensure the loan has a 'loan_payments' key
@@ -130,5 +130,5 @@ def add_payment_to_loan(loan_id):
     # add the payment to the loan's loan_payments list
     loan["loan_payments"].append(new_payment)
 
-    logging.info("Payment added successfully: %s", new_payment)
+    logging.info("[INFO]: payment added successfully: %s", new_payment)
     return jsonify(new_payment), 201

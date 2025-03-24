@@ -51,16 +51,20 @@ class LoanType(graphene.ObjectType):
         Returns:
             list[LoanPaymentType]: List of payments related to the loan.
         """
-        logging.info("Fetching loan payments for loan ID: %d", self["id"])
-        
-        payments = [payment for payment in loan_payments if payment["loan_id"] == self["id"]]
+        try:
+            logging.info("[INFO]: fetching loan payments for loan ID: %d", self["id"])
+            
+            payments = [payment for payment in loan_payments if payment["loan_id"] == self["id"]]
 
-        if payments:
-            logging.info("Found %d payments for loan ID: %d", len(payments), self["id"])
-        else:
-            logging.warning("No payments found for loan ID: %d", self["id"])
-        
-        return payments
+            if payments:
+                logging.info("[INFO]: found %d payments for loan ID: %d", len(payments), self["id"])
+            else:
+                logging.warning("[WARNING]: no payments found for loan ID: %d", self["id"])
+
+            return payments
+        except Exception as e:
+            logging.error("[ERROR]: error fetching loan payments for loan ID %d: %s", self["id"], str(e))
+            return []
 
 
 class Query(graphene.ObjectType):
@@ -84,8 +88,12 @@ class Query(graphene.ObjectType):
         Returns:
             list[LoanType]: List of all loans.
         """
-        logging.info("Fetching all loans. Total loans available: %d", len(loans))
-        return loans
+        try:
+            logging.info("[INFO]: fetching all loans. Total loans available: %d", len(loans))
+            return loans
+        except Exception as e:
+            logging.error("[ERROR]: error fetching loans: %s", str(e))
+            return []  # Return an empty list in case of an error
 
     def resolve_loan(self, info, id):
         """
@@ -98,17 +106,21 @@ class Query(graphene.ObjectType):
         Returns:
             LoanType or None: The loan object if found, otherwise None.
         """
-        logging.info("Fetching loan with ID: %d", id)
+        try:
+            logging.info("[INFO]: fetching loan with ID: %d", id)
 
-        loan = next((loan for loan in loans if loan["id"] == id), None)
-        
-        if loan:
-            logging.info("Loan found: %s", loan)
-        else:
-            logging.warning("Loan with ID %d not found", id)
+            loan = next((loan for loan in loans if loan["id"] == id), None)
+            
+            if loan:
+                logging.info("[INFO]: loan found: %s", loan)
+            else:
+                logging.warning("[WARNING]: Loan with ID %d not found", id)
 
-        return loan
+            return loan
+        except Exception as e:
+            logging.error("[ERROR]: error fetching loan with ID %d: %s", id, str(e))
+            return None
 
 
-# Define the GraphQL schema
+# define the GraphQL schema
 schema = graphene.Schema(query=Query)
