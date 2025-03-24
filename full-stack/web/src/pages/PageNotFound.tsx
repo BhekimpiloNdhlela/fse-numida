@@ -2,7 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Container } from "react-bootstrap";
 
-const PageNotFound: React.FC = () => {
+/**
+ * 404 Page Not Found component.
+ * 
+ * Displays a user-friendly error message when a route doesn't exist,
+ * with a button to navigate back to the home page.
+ * 
+ 
+ * @returns {JSX.Element} The rendered 404 page component
+ */
+const PageNotFound: React.FC = (): JSX.Element => {
   return (
     <Container
       className="d-flex flex-column justify-content-center align-items-center"

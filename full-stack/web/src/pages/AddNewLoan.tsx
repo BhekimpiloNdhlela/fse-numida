@@ -4,39 +4,55 @@ import { useNavigate } from "react-router-dom";
 import CustomButton from "../components/common/CustomButton";
 import NotificationAlert from "../components/common/NotificationAlert";
 
-const AddNewLoan = () => {
+/**
+ * Interface for the new loan data structure
+ */
+interface NewLoanData {
+  name: string;
+  principal: number;
+  interest_rate: number;
+  due_date: string;
+}
+
+/**
+ * Component for adding a new loan
+ *
+ * @returns {JSX.Element} The AddNewLoan component
+ */
+const AddNewLoan: React.FC = (): JSX.Element => {
   const [name, setName] = useState<string>("");
   const [principal, setPrincipal] = useState<number>(0);
   const [rate, setRate] = useState<number>(0);
   const [months, setMonths] = useState<number>(0);
-  const [dueDate, setDueDate] = useState<string>(""); // New state for due date
+  const [dueDate, setDueDate] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // Handle form submission
-  const handleAddNewLoan = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  /**
+   * Handles form submission for adding a new loan
+   */
+  const handleAddNewLoan = async (): Promise<void> => {
     // Validate inputs
-    if (!name || principal <= 0 || rate <= 0 || months <= 0 || !dueDate) {
+    if (
+      !name.trim() ||
+      principal <= 0 ||
+      rate <= 0 ||
+      months <= 0 ||
+      !dueDate
+    ) {
       setError("Please fill in all fields with valid values.");
       return;
     }
 
-    // Create new loan object
-    const newLoan = {
-      name,
+    const newLoan: NewLoanData = {
+      name: name.trim(),
       principal,
       interest_rate: rate,
-      due_date: dueDate, // Use the selected due date
+      due_date: dueDate,
     };
 
-    console.log(dueDate);
-    
-
     try {
-      // Make a POST request to the backend
       const response = await fetch("http://localhost:2024/add-loan", {
         method: "POST",
         headers: {
@@ -46,17 +62,32 @@ const AddNewLoan = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to add loan.");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to add loan");
       }
 
-      // Handle success
       setSuccess(true);
       setError(null);
-      setTimeout(() => navigate("/"), 2000); // Redirect to the loan list page after 2 seconds
+      setTimeout(() => navigate("/"), 2000);
     } catch (err) {
-      setError(err.message);
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
       setSuccess(false);
     }
+  };
+
+  /**
+   * Handles numeric input changes with validation
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event
+   * @param {React.Dispatch<React.SetStateAction<number>>} setter - The state setter function
+   */
+  const handleNumericChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: React.Dispatch<React.SetStateAction<number>>
+  ): void => {
+    const value = parseFloat(e.target.value);
+    setter(isNaN(value) ? 0 : value);
   };
 
   return (
@@ -73,6 +104,9 @@ const AddNewLoan = () => {
             onChange={(e) => setName(e.target.value)}
             required
           />
+          <Form.Text className="text-muted">
+            Provide a valid loan name.
+          </Form.Text>
         </Form.Group>
 
         {/* Principal Amount */}
@@ -81,11 +115,15 @@ const AddNewLoan = () => {
           <Form.Control
             type="number"
             placeholder="Enter principal amount"
-            value={principal}
-            onChange={(e) => setPrincipal(parseFloat(e.target.value))}
+            value={principal || ""}
+            onChange={(e) => handleNumericChange(e, setPrincipal)}
             min="0"
+            step="0.01"
             required
           />
+          <Form.Text className="text-muted">
+            Provide a valid loan principal amount.
+          </Form.Text>
         </Form.Group>
 
         {/* Annual Interest Rate */}
@@ -94,11 +132,15 @@ const AddNewLoan = () => {
           <Form.Control
             type="number"
             placeholder="Enter annual interest rate"
-            value={rate}
-            onChange={(e) => setRate(parseFloat(e.target.value))}
+            value={rate || ""}
+            onChange={(e) => handleNumericChange(e, setRate)}
             min="0"
+            step="0.01"
             required
           />
+          <Form.Text className="text-muted">
+            Provide a valid loan interest rate.
+          </Form.Text>
         </Form.Group>
 
         {/* Loan Term (Months) */}
@@ -107,11 +149,15 @@ const AddNewLoan = () => {
           <Form.Control
             type="number"
             placeholder="Enter loan term in months"
-            value={months}
-            onChange={(e) => setMonths(parseFloat(e.target.value))}
+            value={months || ""}
+            onChange={(e) => handleNumericChange(e, setMonths)}
             min="0"
+            step="1"
             required
           />
+          <Form.Text className="text-muted">
+            Provide a valid loan term.
+          </Form.Text>
         </Form.Group>
 
         {/* Loan Due Date */}
@@ -123,21 +169,21 @@ const AddNewLoan = () => {
             onChange={(e) => setDueDate(e.target.value)}
             required
           />
+          <Form.Text className="text-muted">
+            Provide a valid loan due date.
+          </Form.Text>
         </Form.Group>
 
-        {/* Submit Button */}
-        <CustomButton label="Add Loan" type="dark" onClick={handleAddNewLoan} />
-
-        {/* Error Message */}
+        {/* Error and Success Messages */}
         {error && <NotificationAlert type="danger" message={error} />}
-
-        {/* Success Message */}
         {success && (
           <NotificationAlert
             type="success"
             message="Loan added successfully!"
           />
         )}
+
+        <CustomButton label="Add Loan" type="dark" onClick={handleAddNewLoan} />
       </Form>
     </Container>
   );
